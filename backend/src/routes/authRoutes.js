@@ -1,11 +1,18 @@
+
 const express = require("express");
 const bcrypt = require("bcrypt");
 const db = require("../config/db");
 const router = express.Router();
+const { login } = require("../controllers/authController");
+const {
+    getProfile,
+    updateProfile
+} = require("../controllers/profileController");
+const authMiddleware = require("../middleware/authMiddleware");
 router.get("/test", (req, res) => {
     res.send("Authentication routes are working!");
 });
-
+router.post("/login", login);
 // Define routes here
 router.post("/register", async (req, res) => {
 
@@ -60,5 +67,7 @@ router.post("/register", async (req, res) => {
     }
 
 });
+router.get("/profile", authMiddleware, getProfile);
+router.patch("/profile", authMiddleware, updateProfile);
 
 module.exports = router;

@@ -1,8 +1,8 @@
 
-import React, { useState } from "react";
+import { useState } from "react";
 import "./Registration.css";
 
-function Registration() {
+function Registration({ onRegisterSuccess }) {
 
     const [formData, setFormData] = useState({
         name: "",
@@ -60,10 +60,14 @@ function Registration() {
 
             const data = await response.json();
 
-            setMessage(data.message);
+            if (response.ok) {
+                onRegisterSuccess();
+            } else {
+                setMessage(data.message || "Registration failed. Please try again.");
+            }
 
         } catch (error) {
-            console.log("Registration error:", error);
+            console.error("Registration error:", error);
             setMessage("Unable to connect to server. Please try again.");
         }
     };

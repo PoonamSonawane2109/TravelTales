@@ -5,6 +5,7 @@ const cors = require("cors");
 const helmet = require("helmet");
 
 const authRoutes = require("./routes/authRoutes");
+const contactRoutes = require("./routes/contactRoutes");
 
 const app = express();
 
@@ -16,6 +17,8 @@ app.use(express.json());
 
 // Authentication routes
 app.use("/api/auth", authRoutes);
+app.use("/api/contact", contactRoutes);
+
 
 app.get("/", (req, res) => {
     res.send("User Authentication API is running");
