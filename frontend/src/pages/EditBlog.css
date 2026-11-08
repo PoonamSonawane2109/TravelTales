@@ -1,0 +1,187 @@
+
+/* Main Edit Blog Form */
+.edit-blog-form {
+    max-width: 850px;
+    margin: 30px auto;
+    padding: 35px;
+    background: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+/* Form Groups */
+.edit-blog-form .form-group {
+    margin-bottom: 25px;
+}
+
+/* Labels */
+.edit-blog-form label {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #183344;
+}
+
+/* Input Fields and Dropdowns */
+.edit-blog-form input:not([type="file"]),
+.edit-blog-form select,
+.edit-blog-form textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #d5e0e5;
+    border-radius: 8px;
+    font-size: 15px;
+    color: #183344;
+    background: #ffffff;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+/* Focus Effect */
+.edit-blog-form input:focus,
+.edit-blog-form select:focus,
+.edit-blog-form textarea:focus {
+    border-color: #168c91;
+}
+
+/* Textarea */
+.edit-blog-form textarea {
+    resize: vertical;
+    min-height: 120px;
+    font-family: Arial, sans-serif;
+}
+
+/* File Inputs */
+.edit-blog-form input[type="file"] {
+    width: 100%;
+    padding: 12px;
+    border: 1px dashed #9bb8c1;
+    border-radius: 8px;
+    background: #f8fbfc;
+}
+
+/* Image Preview Layout */
+.edit-blog-form .additional-images-preview {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 15px;
+}
+
+/* Individual Image */
+.edit-blog-form .image-preview {
+    width: 180px;
+    padding: 10px;
+    background: #f8fbfc;
+    border: 1px solid #e1e9ec;
+    border-radius: 10px;
+}
+
+.edit-blog-form .image-preview img {
+    width: 100%;
+    height: 130px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+/* Image Name and Caption */
+.edit-blog-form .image-preview p {
+    margin-top: 8px;
+    font-size: 12px;
+    color: #526873;
+    word-break: break-word;
+}
+
+/* Remove Image Button */
+.edit-blog-form .image-preview button {
+    margin-top: 8px;
+    padding: 7px 12px;
+    background: #fff0f0;
+    color: #c0392b;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+/* Mobile Responsive */
+@media (max-width: 600px) {
+
+    .edit-blog-form {
+        margin: 15px;
+        padding: 20px;
+    }
+
+    .edit-blog-form .image-preview {
+        width: 145px;
+    }
+
+}
+
+.edit-blog-title {
+    font-size: 28px;
+    color: #183344;
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #e5edef;
+}
+
+/* Back to My Blogs Button */
+.edit-back-btn {
+    display: block;
+    margin: 20px auto;
+    padding: 11px 22px;
+    background: #ffffff;
+    color: #168c91;
+    border: 1px solid #168c91;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.edit-back-btn:hover {
+    background: #168c91;
+    color: #ffffff;
+    transform: translateY(-2px);
+}
+
+/* Edit form buttons */
+.edit-form-buttons {
+    display: flex;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.save-changes-btn {
+    padding: 12px 25px;
+    background: #168c91;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.save-changes-btn:hover {
+    background: #116f73;
+}
+
+.cancel-edit-btn {
+    padding: 12px 25px;
+    background: white;
+    color: #526873;
+    border: 1px solid #cbd8dc;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.cancel-edit-btn:hover {
+    background: #f1f5f6;
+}

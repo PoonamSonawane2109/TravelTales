@@ -1,0 +1,33 @@
+.story-cta {
+    background-color: #eaf2f4;
+    text-align: center;
+    padding: 60px 20px;
+    margin: 40px 0;
+}
+
+.story-cta h2 {
+    font-size: 32px;
+    color: #183344;
+    margin-bottom: 15px;
+}
+
+.story-cta p {
+    font-size: 16px;
+    color: #526773;
+    margin-bottom: 25px;
+    line-height: 1.6;
+}
+
+.story-btn {
+    background-color: #087e8b;
+    color: white;
+    border: none;
+    padding: 13px 28px;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.story-btn:hover {
+    background-color: #06636d;
+}

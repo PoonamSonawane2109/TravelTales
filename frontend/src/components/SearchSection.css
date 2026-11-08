@@ -1,0 +1,100 @@
+.search-section {
+    padding: 42px 8% 30px;
+    max-width: 1600px;
+    margin: auto;
+    background-color: white;
+}
+
+/* Search bar */
+.search-bar {
+    display: flex;
+    gap: 14px;
+    width: 100%;
+}
+
+.search-bar input {
+    flex: 1;
+    padding: 17px;
+    border: 1px solid #d5e2e8;
+    border-radius: 9px;
+    font-size: 16px;
+    outline: none;
+    color: #183344;
+}
+
+.search-bar input:focus {
+    border-color: #087b9c;
+}
+
+.search-btn {
+    padding: 0 26px;
+    background-color: #087b9c;
+    color: white;
+    border: none;
+    border-radius: 9px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* Category and sorting row */
+.filter-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 30px;
+    gap: 20px;
+}
+
+.category-buttons {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.category-btn {
+    padding: 13px 22px;
+    border: none;
+    border-radius: 25px;
+    background-color: #f1f7f9;
+    color: #657e8e;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.category-btn.active {
+    background-color: #087b9c;
+    color: white;
+}
+
+/* Sorting dropdown */
+.sort-select {
+    padding: 13px 15px;
+    border: 1px solid #d5e2e8;
+    border-radius: 9px;
+    background-color: white;
+    color: #183344;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+/* Mobile layout */
+@media (max-width: 768px) {
+
+    .search-section {
+        padding: 30px 6%;
+    }
+
+    .search-bar {
+        flex-direction: column;
+    }
+
+    .search-btn {
+        padding: 15px;
+    }
+
+    .filter-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
