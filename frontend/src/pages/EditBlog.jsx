@@ -1,13 +1,23 @@
-
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { authenticatedFetch, API_ROOT_URL } from "../api";
 import "./EditBlog.css";
 
 function EditBlog() {
   const { id } = useParams();
   const navigate = useNavigate();
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+        navigate("/login");
+    }
+}, [navigate]);
 
   const [blog, setBlog] = useState(null);
+  const [destinations, setDestinations] = useState([]);
+  const [customDestination, setCustomDestination] = useState("");
+  const [customCountry, setCustomCountry] = useState("");
   const [formData, setFormData] = useState({
     title: "",
     destination_id: "",
@@ -22,12 +32,35 @@ function EditBlog() {
   const [newCoverImage, setNewCoverImage] = useState(null);
   const [newAdditionalImages, setNewAdditionalImages] = useState([]);
 
+  // Fetch all destinations
+  useEffect(() => {
+    const fetchDestinations = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/destinations");
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch destinations");
+        }
+
+        setDestinations(result);
+      } catch (error) {
+        console.log("Error fetching destinations:", error);
+      }
+    };
+
+    fetchDestinations();
+  }, []);
+
   // Fetch existing blog details
   useEffect(() => {
     const fetchBlog = async () => {
       try {
-        const response = await fetch(
-          `http://localhost:5000/api/blogs/edit/${id}`,
+        const response = await authenticatedFetch(
+          `/blogs/edit/${id}`,
+          {},
+          API_ROOT_URL,
         );
 
         const result = await response.json();
@@ -60,51 +93,51 @@ function EditBlog() {
     fetchBlog();
   }, [id]);
 
-
   // ADD handleSubmit HERE
-const handleSubmit = async (e) => {
-
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const data = new FormData();
 
     data.append("title", formData.title);
     data.append("destination_id", formData.destination_id);
+    data.append("customDestination", customDestination);
+    data.append("customCountry", customCountry);
     data.append("category_id", formData.category_id);
     data.append("travel_date", formData.travel_date);
     data.append("story", formData.story);
     data.append("travel_tips", formData.travel_tips);
 
     if (newCoverImage) {
-        data.append("coverImage", newCoverImage);
+      data.append("coverImage", newCoverImage);
     }
 
     newAdditionalImages.forEach((image) => {
-        data.append("additionalImages", image);
+      data.append("additionalImages", image);
     });
 
     try {
-        const response = await fetch(
-            `http://localhost:5000/api/blogs/${id}`,
-            {
-                method: "PUT",
-                body: data
-            }
-        );
+      const response = await authenticatedFetch(
+        `/blogs/${id}`,
+        {
+          method: "PUT",
+          body: data,
+        },
+        API_ROOT_URL,
+      );
 
-        const result = await response.json();
+      const result = await response.json();
 
-        if (!response.ok) {
-            throw new Error(result.message);
-        }
+      if (!response.ok) {
+        throw new Error(result.message);
+      }
 
-        alert(result.message);
-        navigate("/my-blogs");
-
+      alert(result.message);
+      navigate("/my-blogs");
     } catch (err) {
-        alert("Error updating blog: " + err.message);
+      alert("Error updating blog: " + err.message);
     }
-};
+  };
 
   if (loading) {
     return <h2>Loading blog details...</h2>;
@@ -116,374 +149,358 @@ const handleSubmit = async (e) => {
 
   return (
     <div>
-      
+      <form className="edit-blog-form" onSubmit={handleSubmit}>
+        <h1 className="edit-blog-title">Edit Your Travel Blog</h1>
 
-     <form className="edit-blog-form" onSubmit={handleSubmit}>
+        {/* Blog Title */}
+        <div className="form-group">
+          <label>Blog Title</label>
 
-      <h1 className="edit-blog-title">
-        Edit Your Travel Blog
-    </h1>
-
-    {/* Blog Title */}
-    <div className="form-group">
-        <label>Blog Title</label>
-
-        <input
+          <input
             type="text"
             name="title"
             value={formData.title}
             onChange={(e) =>
-                setFormData({
-                    ...formData,
-                    title: e.target.value
-                })
+              setFormData({
+                ...formData,
+                title: e.target.value,
+              })
             }
             required
             maxLength={50}
-        />
-    </div>
+          />
+        </div>
+        {/* Destination */}
+        <div className="form-group">
+          <label>Destination</label>
 
-          
-{/* Destination */}
-<div className="form-group">
-
-    <label>Destination</label>
-
-    <select
-        name="destination_id"
-        value={formData.destination_id}
-        onChange={(e) =>
-            setFormData({
+          <select
+            name="destination_id"
+            value={formData.destination_id}
+            onChange={(e) =>
+              setFormData({
                 ...formData,
-                destination_id: e.target.value
-            })
-        }
-        required
-    >
-        <option value="">Select destination</option>
-        <option value="1">Goa</option>
-        <option value="2">Manali</option>
-        <option value="3">Jaipur</option>
-    </select>
+                destination_id: e.target.value,
+              })
+            }
+            required
+          >
+            <option value="">Select destination</option>
 
-</div>
-  
-  
-{/* Category */}
-<div className="form-group">
+            {destinations.map((destination) => (
+              <option
+                key={destination.destination_id}
+                value={destination.destination_id}
+              >
+                {destination.destination_name}
+              </option>
+            ))}
 
-    <label>Category</label>
+            <option value="other">Other</option>
+          </select>
+        </div>
 
-    <select
-        name="category_id"
-        value={formData.category_id}
-        onChange={(e) =>
-            setFormData({
+        {/* Custom Destination */}
+        {formData.destination_id === "other" && (
+          <>
+            <div className="form-group">
+              <label>Enter Destination Name</label>
+
+              <input
+                type="text"
+                value={customDestination}
+                onChange={(e) => setCustomDestination(e.target.value)}
+                placeholder="Enter destination name"
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Enter Country</label>
+
+              <input
+                type="text"
+                value={customCountry}
+                onChange={(e) => setCustomCountry(e.target.value)}
+                placeholder="Enter country"
+                required
+              />
+            </div>
+          </>
+        )}
+
+        {/* Category */}
+        <div className="form-group">
+          <label>Category</label>
+
+          <select
+            name="category_id"
+            value={formData.category_id}
+            onChange={(e) =>
+              setFormData({
                 ...formData,
-                category_id: e.target.value
-            })
-        }
-        required
-    >
-        <option value="">Select category</option>
-        <option value="1">Beaches</option>
-        <option value="2">Mountains</option>
-        <option value="3">Historical Places</option>
-        <option value="4">Adventure</option>
-        <option value="5">Nature and Wildlife</option>
-        <option value="6">Religious Places</option>
-        <option value="7">Cities</option>
-    </select>
+                category_id: e.target.value,
+              })
+            }
+            required
+          >
+            <option value="">Select category</option>
+            <option value="1">Beaches</option>
+            <option value="2">Mountains</option>
+            <option value="3">Historical Places</option>
+            <option value="4">Adventure</option>
+            <option value="5">Nature and Wildlife</option>
+            <option value="6">Religious Places</option>
+            <option value="7">Cities</option>
+          </select>
+        </div>
 
-</div>
+        {/* Travel Date */}
+        <div className="form-group">
+          <label>Travel Date</label>
 
-
-{/* Travel Date */}
-<div className="form-group">
-
-    <label>Travel Date</label>
-
-    <input
-        type="date"
-        name="travel_date"
-        value={formData.travel_date}
-        onChange={(e) =>
-            setFormData({
+          <input
+            type="date"
+            name="travel_date"
+            value={formData.travel_date}
+            onChange={(e) =>
+              setFormData({
                 ...formData,
-                travel_date: e.target.value
-            })
-        }
-        required
-    />
+                travel_date: e.target.value,
+              })
+            }
+            required
+          />
+        </div>
 
-</div>
+        {/* Travel Story */}
+        <div className="form-group">
+          <label>Travel Story</label>
 
-
-
-{/* Travel Story */}
-<div className="form-group">
-
-    <label>Travel Story</label>
-
-    <textarea
-        name="story"
-        rows="8"
-        placeholder="Write your complete travel experience..."
-        value={formData.story}
-        onChange={(e) =>
-            setFormData({
+          <textarea
+            name="story"
+            rows="8"
+            placeholder="Write your complete travel experience..."
+            value={formData.story}
+            onChange={(e) =>
+              setFormData({
                 ...formData,
-                story: e.target.value
-            })
-        }
-        required
-        maxLength={5000}
-    />
+                story: e.target.value,
+              })
+            }
+            required
+            maxLength={5000}
+          />
 
-    <p>
-        {formData.story.length}/5000 characters
-    </p>
+          <p>{formData.story.length}/5000 characters</p>
+        </div>
 
-</div>
+        {/* Travel Tips */}
+        <div className="form-group">
+          <label>Travel Tips</label>
 
-
-
-{/* Travel Tips */}
-<div className="form-group">
-
-    <label>Travel Tips</label>
-
-    <textarea
-        name="travel_tips"
-        rows="4"
-        placeholder="Share useful tips for other travellers..."
-        value={formData.travel_tips}
-        onChange={(e) =>
-            setFormData({
+          <textarea
+            name="travel_tips"
+            rows="4"
+            placeholder="Share useful tips for other travellers..."
+            value={formData.travel_tips}
+            onChange={(e) =>
+              setFormData({
                 ...formData,
-                travel_tips: e.target.value
-            })
-        }
-        maxLength={1000}
-    />
+                travel_tips: e.target.value,
+              })
+            }
+            maxLength={1000}
+          />
 
-    <p>
-        {formData.travel_tips.length}/1000 characters
-    </p>
+          <p>{formData.travel_tips.length}/1000 characters</p>
+        </div>
 
-</div>
+        {/* Existing Cover Image */}
+        <div className="form-group">
+          <label>Current Cover Image</label>
 
-
-
-{/* Existing Cover Image */}
-<div className="form-group">
-
-    <label>Current Cover Image</label>
-
-    {blog.cover_image && (
-        <div className="image-preview">
-            <img
+          {blog.cover_image && (
+            <div className="image-preview">
+              <img
                 src={`http://localhost:5000${blog.cover_image}`}
                 alt="Current cover"
                 style={{
-                    width: "250px",
-                    height: "180px",
-                    objectFit: "cover",
-                    borderRadius: "10px"
+                  width: "250px",
+                  height: "180px",
+                  objectFit: "cover",
+                  borderRadius: "10px",
                 }}
-            />
+              />
+            </div>
+          )}
         </div>
-    )}
 
-</div>
+        {/* Replace Cover Image */}
+        <div className="form-group">
+          <label>Choose New Cover Image (Optional)</label>
 
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => {
+              const file = e.target.files[0];
 
-{/* Replace Cover Image */}
-<div className="form-group">
+              if (!file) return;
 
-    <label>Choose New Cover Image (Optional)</label>
-
-    <input
-        type="file"
-        accept="image/*"
-        onChange={(e) => {
-            const file = e.target.files[0];
-
-            if (!file) return;
-
-            if (!file.type.startsWith("image/")) {
+              if (!file.type.startsWith("image/")) {
                 alert("Please select a valid image.");
                 e.target.value = "";
                 return;
-            }
+              }
 
-            if (file.size > 5 * 1024 * 1024) {
+              if (file.size > 5 * 1024 * 1024) {
                 alert("Image must be smaller than 5 MB.");
                 e.target.value = "";
                 return;
-            }
+              }
 
-            setNewCoverImage(file);
-        }}
-    />
+              setNewCoverImage(file);
+            }}
+          />
 
-    {newCoverImage && (
-        <div className="image-preview">
-            <img
+          {newCoverImage && (
+            <div className="image-preview">
+              <img
                 src={URL.createObjectURL(newCoverImage)}
                 alt="New cover preview"
                 style={{
-                    width: "250px",
-                    height: "180px",
-                    objectFit: "cover",
-                    borderRadius: "10px"
+                  width: "250px",
+                  height: "180px",
+                  objectFit: "cover",
+                  borderRadius: "10px",
                 }}
-            />
-            <p>{newCoverImage.name}</p>
+              />
+              <p>{newCoverImage.name}</p>
+            </div>
+          )}
         </div>
-    )}
 
-</div>
+        {/* Existing Additional Images */}
+        <div className="form-group">
+          <label>Current Additional Images</label>
 
-
-{/* Existing Additional Images */}
-<div className="form-group">
-
-    <label>Current Additional Images</label>
-
-    <div className="additional-images-preview">
-
-        {images.map((image) => (
-            <div className="image-preview" key={image.image_id}>
-
+          <div className="additional-images-preview">
+            {images.map((image) => (
+              <div className="image-preview" key={image.image_id}>
                 <img
-                    src={`http://localhost:5000${image.image_path}`}
-                    alt={image.image_caption}
-                    style={{
-                        width: "180px",
-                        height: "140px",
-                        objectFit: "cover",
-                        borderRadius: "10px"
-                    }}
+                  src={`http://localhost:5000${image.image_path}`}
+                  alt={image.image_caption}
+                  style={{
+                    width: "180px",
+                    height: "140px",
+                    objectFit: "cover",
+                    borderRadius: "10px",
+                  }}
                 />
 
                 <p>{image.image_caption}</p>
+              </div>
+            ))}
+          </div>
+        </div>
 
-            </div>
-        ))}
+        {/* Add More Images */}
+        <div className="form-group">
+          <label>Add More Images (Maximum 5 new images)</label>
 
-    </div>
+          <input
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={(e) => {
+              const selectedImages = Array.from(e.target.files);
 
-</div>
+              const remainingSlots = 5 - newAdditionalImages.length;
 
-
-{/* Add More Images */}
-<div className="form-group">
-
-    <label>Add More Images (Maximum 5 new images)</label>
-
-    <input
-        type="file"
-        accept="image/*"
-        multiple
-        onChange={(e) => {
-
-            const selectedImages = Array.from(e.target.files);
-
-            const remainingSlots = 5 - newAdditionalImages.length;
-
-            if (selectedImages.length > remainingSlots) {
+              if (selectedImages.length > remainingSlots) {
                 alert(`You can select only ${remainingSlots} more image(s).`);
-            }
+              }
 
-            const validImages = selectedImages
+              const validImages = selectedImages
                 .slice(0, remainingSlots)
                 .filter((image) => {
+                  if (!image.type.startsWith("image/")) {
+                    alert(`${image.name} is not a valid image.`);
+                    return false;
+                  }
 
-                    if (!image.type.startsWith("image/")) {
-                        alert(`${image.name} is not a valid image.`);
-                        return false;
-                    }
+                  if (image.size > 5 * 1024 * 1024) {
+                    alert(`${image.name} is larger than 5 MB.`);
+                    return false;
+                  }
 
-                    if (image.size > 5 * 1024 * 1024) {
-                        alert(`${image.name} is larger than 5 MB.`);
-                        return false;
-                    }
-
-                    return true;
+                  return true;
                 });
 
-            setNewAdditionalImages((previousImages) => [
+              setNewAdditionalImages((previousImages) => [
                 ...previousImages,
-                ...validImages
-            ]);
+                ...validImages,
+              ]);
 
-            e.target.value = "";
-        }}
-    />
+              e.target.value = "";
+            }}
+          />
 
-    <div className="additional-images-preview">
-
-        {newAdditionalImages.map((image, index) => (
-            <div className="image-preview" key={index}>
-
+          <div className="additional-images-preview">
+            {newAdditionalImages.map((image, index) => (
+              <div className="image-preview" key={index}>
                 <img
-                    src={URL.createObjectURL(image)}
-                    alt={`New image ${index + 1}`}
-                    style={{
-                        width: "180px",
-                        height: "140px",
-                        objectFit: "cover",
-                        borderRadius: "10px"
-                    }}
+                  src={URL.createObjectURL(image)}
+                  alt={`New image ${index + 1}`}
+                  style={{
+                    width: "180px",
+                    height: "140px",
+                    objectFit: "cover",
+                    borderRadius: "10px",
+                  }}
                 />
 
                 <p>{image.name}</p>
 
                 <button
-                    type="button"
-                    onClick={() => {
-                        setNewAdditionalImages((previousImages) =>
-                            previousImages.filter((_, i) => i !== index)
-                        );
-                    }}
+                  type="button"
+                  onClick={() => {
+                    setNewAdditionalImages((previousImages) =>
+                      previousImages.filter((_, i) => i !== index),
+                    );
+                  }}
                 >
-                    Remove
+                  Remove
                 </button>
+              </div>
+            ))}
+          </div>
+        </div>
 
-            </div>
-        ))}
+        {/* Form Buttons */}
+        <div className="edit-form-buttons">
+          <button type="submit" className="save-changes-btn">
+            Save Changes
+          </button>
 
-    </div>
+          <button
+            type="button"
+            className="cancel-edit-btn"
+            onClick={() => navigate("/my-blogs")}
+          >
+            Cancel
+          </button>
+        </div>
+      </form>
 
-</div>
-
-{/* Form Buttons */}
-<div className="edit-form-buttons">
-
-    <button type="submit" className="save-changes-btn">
-        Save Changes
-    </button>
-
-    <button
+      <button
         type="button"
-        className="cancel-edit-btn"
+        className="edit-back-btn"
         onClick={() => navigate("/my-blogs")}
-    >
-        Cancel
-    </button>
-
-</div>
-
-</form>
-
-<button
-    type="button"
-    className="edit-back-btn"
-    onClick={() => navigate("/my-blogs")}
->
-    ← Back to My Blogs
-</button>
+      >
+        ← Back to My Blogs
+      </button>
     </div>
   );
 }

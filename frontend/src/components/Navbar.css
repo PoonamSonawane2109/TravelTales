@@ -52,7 +52,38 @@
     font-size: 15px;
     cursor: pointer;
 }
+/* Profile and Logout Buttons */
+.nav-buttons button {
+    padding: 11px 22px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
 
+.nav-buttons button:not(.login-btn):not(.register-btn) {
+    border: 1px solid #087b9c;
+    background-color: white;
+    color: #087b9c;
+}
+
+.nav-buttons button:not(.login-btn):not(.register-btn):hover {
+    background-color: #087b9c;
+    color: white;
+}
+
+/* Logout Button */
+.nav-buttons button:last-child:not(.register-btn) {
+    background-color: #087b9c;
+    color: white;
+    border: 1px solid #087b9c;
+}
+
+.nav-buttons button:last-child:not(.register-btn):hover {
+    background-color: #065d78;
+    border-color: #065d78;
+}
 .login-btn {
     background-color: white;
     color: #087b9c;
